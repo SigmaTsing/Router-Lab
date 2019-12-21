@@ -1,6 +1,10 @@
 #include "router.h"
+#include "router_hal.h"
+#include "rip.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
+#include<stdio.h>
 
 /*
   RoutingTable Entry 的定义如下：
@@ -18,6 +22,9 @@
   你可以在全局变量中把路由表以一定的数据结构格式保存下来。
 */
 
+RoutingTableEntry table[2000];
+int p_table;
+
 /**
  * @brief 插入/删除一条路由表表项
  * @param insert 如果要插入则为 true ，要删除则为 false
@@ -26,8 +33,80 @@
  * 插入时如果已经存在一条 addr 和 len 都相同的表项，则替换掉原有的。
  * 删除时按照 addr 和 len 匹配。
  */
+bool check(uint32_t a, uint32_t b){
+  // printf("%x %x %x %x\n", (b>>8)&0xff, (b>>16)&0xff, (b>>24)&0xff, b&0xff);
+  // printf("%x %x %x %x\n", (a>>8)&0xff, (a>>16)&0xff, (a>>24)&0xff, a&0xff);
+  return (((b>>8)&0xff)==0 || ((b>>8)&0xff)== ((a>>8)&0xff))&&
+        (((b>>16)&0xff)==0 || ((b>>16)&0xff)== ((a>>16)&0xff))&&
+        (((b>>24)&0xff)==0 || ((b>>24)&0xff)== ((a>>24)&0xff))&&
+        ((b&0xff)==0 || (b&0xff)== (a&0xff));
+}
+
+
+
+
+uint32_t clo(uint32_t mask){
+  uint32_t cnt=0;
+  for(int i=0;i<=31;i++){
+    if(((mask>>i)&0x1)==1){
+      cnt++;
+    }else{
+      return cnt;
+    }
+  }
+  return cnt;
+}
+
+uint32_t genMask(uint32_t len){
+  return htonl(0xffffffff << (32 - len));
+}
+
+
+void vertical(uint32_t reidx, RipPacket *resp){
+  resp->numEntries=0;
+  for(int i=0;i<p_table;i++){
+    if(table[i].if_index!=reidx){
+      resp->entries[resp->numEntries]={
+        .addr=table[i].addr,
+        .mask=genMask(table[i].len),
+        .nexthop=table[i].nexthop,
+        .metric=table[i].metric
+      };
+      resp->numEntries++;
+    }
+  }
+}
+
+void printAll(){
+  for(int i=0;i<p_table;i++){
+    printf("|addr: %x |len: %u |if_index: %u |nexthop: %x | metric: %u \n", table[i].addr, table[i].len, table[i].if_index, table[i].nexthop, table[i].metric);
+  }
+}
+
 void update(bool insert, RoutingTableEntry entry) {
   // TODO:
+  printf("inserting addr %x\n", entry.addr);
+  if(insert){
+    for(int i=0;i<p_table;i++){
+      if(table[i].addr==entry.addr && table[i].len==entry.len){
+        if(entry.metric<=table[i].metric){
+          table[i]=entry;
+          printf("inserted\n");
+        }else
+          printf("metric biger, ignore\n");
+        return;
+      }
+    }
+    table[p_table++]=entry;
+  }else{
+    for(int i=0;i<p_table;i++){
+      if(table[i].addr==entry.addr && table[i].len==entry.len){
+        for(int j=i;j<p_table-1;j++) table[i]=table[i+1];
+        p_table--;
+        return;
+      }
+    }
+  }
 }
 
 /**
@@ -41,5 +120,33 @@ bool query(uint32_t addr, uint32_t *nexthop, uint32_t *if_index) {
   // TODO:
   *nexthop = 0;
   *if_index = 0;
-  return false;
+  bool cz=false;
+  for(int i=0;i<p_table;i++){
+    if(check(addr,table[i].addr)){
+      *nexthop=table[i].nexthop;
+      *if_index=table[i].if_index;
+      cz=true;
+      if(addr==table[i].addr)
+        return true;
+    }
+  }
+  return cz;
 }
+  void RipFill(RipPacket *resp, int *size, uint32_t src_addr){
+    resp->numEntries=0;
+    for(int i=0;i<p_table;i++){
+      if(check(src_addr, table[i].addr)){
+        continue;
+      }else{
+        RoutingTableEntry entry=table[i];
+        resp->entries[resp->numEntries]={
+          .addr=table[i].addr,
+          .mask=genMask(table[i].len),
+          .nexthop=table[i].nexthop,
+          .metric=table[i].metric
+        };
+        resp->numEntries++;
+      }
+    }
+  }
+  
