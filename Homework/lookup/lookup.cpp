@@ -107,7 +107,7 @@ void update(bool insert, RoutingTableEntry entry) {
       if(table[i].addr==entry.addr && table[i].len==entry.len){
         if(entry.metric<=table[i].metric){
           table[i]=entry;
-          printf("inserted\n");
+          printf("inserted %u %u\n", table[i].metric, entry.metric);
         }else
           printf("metric biger, ignore\n");
         return;
