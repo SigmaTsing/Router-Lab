@@ -25,7 +25,7 @@
 RoutingTableEntry table[2000];
 int next[2000];
 int front[2000];
-int p_table=1;
+int p_table=0;
 // int fin=0;
 
 /**
@@ -103,6 +103,7 @@ void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
 
 void printAll(){
   // for(int i=0;i<p_table;i++){
+  //printf("printing %d", next[0]);
   for(int i=next[0];next[i]!=0;i=next[i]){
     printf("|addr: %x |len: %u |if_index: %u |nexthop: %x | metric: %u \n", table[i].addr, table[i].len, table[i].if_index, table[i].nexthop, table[i].metric);
   }
@@ -117,6 +118,7 @@ void update(bool insert, RoutingTableEntry entry) {
         if(entry.metric<=table[i].metric){
           table[i]=entry;
           printf("inserted %u %u\n", table[i].metric, entry.metric);
+          return;
         }else
           printf("metric biger, ignore\n");
         return;
@@ -127,9 +129,10 @@ void update(bool insert, RoutingTableEntry entry) {
     front[p_table+1]=p_table;
     next[p_table+1]=0;
     p_table++;
+    printf("inserted num %d\n",  p_table);
     // fin=p_table;
     // table[p_table++]=entry;
-    next
+    //next
   }else{
     // for(int i=0;i<p_table;i++){
   for(int i=next[0];next[i]!=0;i=next[i]){
