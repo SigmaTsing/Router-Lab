@@ -23,7 +23,10 @@
 */
 
 RoutingTableEntry table[2000];
-int p_table;
+int next[2000];
+int front[2000];
+int p_table=1;
+// int fin=0;
 
 /**
  * @brief 插入/删除一条路由表表项
@@ -42,8 +45,11 @@ bool check(uint32_t a, uint32_t b){
         ((b&0xff)==0 || (b&0xff)== (a&0xff));
 }
 
-
-
+void init(){
+  p_table=0;
+  next[0]=0;
+  // fin=0;
+}
 
 uint32_t clo(uint32_t mask){
   uint32_t cnt=0;
@@ -64,7 +70,8 @@ uint32_t genMask(uint32_t len){
 
 void vertical(uint32_t reidx, RipPacket *resp){
   resp->numEntries=0;
-  for(int i=0;i<p_table;i++){
+  // for(int i=0;i<p_table;i++){
+  for(int i=next[0];next[i]!=0;i=next[i]){
     if(table[i].if_index!=reidx){
       resp->entries[resp->numEntries]={
         .addr=table[i].addr,
@@ -79,7 +86,8 @@ void vertical(uint32_t reidx, RipPacket *resp){
 
 void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
   resp->numEntries=0;
-  for(int i=0;i<p_table;i++){
+  // for(int i=0;i<p_table;i++){
+  for(int i=next[0];next[i]!=0;i=next[i]){
     if(table[i].if_index!=reidx){
       resp->entries[resp->numEntries]={
         .addr=table[i].addr,
@@ -94,7 +102,8 @@ void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
 }
 
 void printAll(){
-  for(int i=0;i<p_table;i++){
+  // for(int i=0;i<p_table;i++){
+  for(int i=next[0];next[i]!=0;i=next[i]){
     printf("|addr: %x |len: %u |if_index: %u |nexthop: %x | metric: %u \n", table[i].addr, table[i].len, table[i].if_index, table[i].nexthop, table[i].metric);
   }
 }
@@ -103,7 +112,7 @@ void update(bool insert, RoutingTableEntry entry) {
   // TODO:
   printf("inserting addr %x\n", entry.addr);
   if(insert){
-    for(int i=0;i<p_table;i++){
+    for(int i=next[0];next[i]!=0;i=next[i]){
       if(table[i].addr==entry.addr && table[i].len==entry.len){
         if(entry.metric<=table[i].metric){
           table[i]=entry;
@@ -113,12 +122,22 @@ void update(bool insert, RoutingTableEntry entry) {
         return;
       }
     }
-    table[p_table++]=entry;
+    table[p_table]=entry;
+    next[p_table]=p_table+1;    
+    front[p_table+1]=p_table;
+    next[p_table+1]=0;
+    p_table++;
+    // fin=p_table;
+    // table[p_table++]=entry;
+    next
   }else{
-    for(int i=0;i<p_table;i++){
+    // for(int i=0;i<p_table;i++){
+  for(int i=next[0];next[i]!=0;i=next[i]){
       if(table[i].addr==entry.addr && table[i].len==entry.len){
-        for(int j=i;j<p_table-1;j++) table[i]=table[i+1];
-        p_table--;
+        // for(int j=i;j<p_table-1;j++) table[i]=table[i+1];
+        // p_table--;
+        front[next[i]]=front[i];
+        next[front[i]]=next[i];
         return;
       }
     }
@@ -137,7 +156,8 @@ bool query(uint32_t addr, uint32_t *nexthop, uint32_t *if_index) {
   *nexthop = 0;
   *if_index = 0;
   bool cz=false;
-  for(int i=0;i<p_table;i++){
+  // for(int i=0;i<p_table;i++){
+  for(int i=next[0];next[i]!=0;i=next[i]){
     if(check(addr,table[i].addr)){
       *nexthop=table[i].nexthop;
       *if_index=table[i].if_index;
@@ -150,7 +170,8 @@ bool query(uint32_t addr, uint32_t *nexthop, uint32_t *if_index) {
 }
   void RipFill(RipPacket *resp, int *size, uint32_t src_addr){
     resp->numEntries=0;
-    for(int i=0;i<p_table;i++){
+    // for(int i=0;i<p_table;i++){
+    for(int i=next[0];next[i]!=0;i=next[i]){
       if(check(src_addr, table[i].addr)){
         continue;
       }else{
