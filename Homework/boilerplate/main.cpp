@@ -17,6 +17,7 @@ extern uint32_t clo(uint32_t mask);
 extern void vertical(uint32_t reidx, RipPacket *resp);
 extern void printAll();
 extern uint16_t IPChecksum(uint8_t *packet, size_t len);
+extern void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip)
 
 uint8_t packet[2048];
 uint8_t output[2048];
