@@ -17,7 +17,7 @@ extern uint32_t clo(uint32_t mask);
 extern void vertical(uint32_t reidx, RipPacket *resp);
 extern void printAll();
 extern uint16_t IPChecksum(uint8_t *packet, size_t len);
-extern void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip)
+extern void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip);
 
 uint8_t packet[2048];
 uint8_t output[2048];
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
           // TODO: fill resp
           resp.command=2;
           int size=0;
-          vertical(uint32_t(i), &resp);
+          vertical(if_index, &resp);
           // vertical_2(uint32_t(i), &resp, addrs[i]);
           //printf("vertical 2 result: %u \n", resp.numEntries);
           // assemble
@@ -261,8 +261,8 @@ int main(int argc, char *argv[]) {
               // printf("invalidate entry "+rip.entries[i].addr);
               //tbd:send inval resp
             }else{
-              //printf("updating %x %d\n", rip.entries[i].addr, rip.entries[i].metric);
-              rip.entries[i].metric+=1;
+              printf("updating %x %d\n", rip.entries[i].addr, rip.entries[i].metric);
+              entry.metric+=1;
               update(true, entry);
             }
           }
