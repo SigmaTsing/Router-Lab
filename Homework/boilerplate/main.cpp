@@ -75,7 +75,8 @@ int main(int argc, char *argv[]) {
         ad0[5]=0x09;
         resp.command=2;
         int size=0;
-        vertical(uint32_t(i), &resp);
+        // vertical(uint32_t(i), &resp);
+        vertical_2(uint32_t(i), &resp, addrs[i]);
         //printf("vertical result: %d\n", resp.numEntries);
         output[0] = 0x45;
         output[1] = 0x00;
@@ -189,7 +190,8 @@ int main(int argc, char *argv[]) {
           // TODO: fill resp
           resp.command=2;
           int size=0;
-          vertical(uint32_t(if_index), &resp);
+          vertical(uint32_t(i), &resp);
+          // vertical_2(uint32_t(i), &resp, addrs[i]);
           //printf("vertical 2 result: %u \n", resp.numEntries);
           // assemble
           // IP

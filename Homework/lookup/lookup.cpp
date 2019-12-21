@@ -77,6 +77,22 @@ void vertical(uint32_t reidx, RipPacket *resp){
   }
 }
 
+void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
+  resp->numEntries=0;
+  for(int i=0;i<p_table;i++){
+    if(table[i].if_index!=reidx){
+      resp->entries[resp->numEntries]={
+        .addr=table[i].addr,
+        .mask=genMask(table[i].len),
+        // .nexthop=table[i].nexthop,
+        .nexthop=ip,
+        .metric=table[i].metric
+      };
+      resp->numEntries++;
+    }
+  }
+}
+
 void printAll(){
   for(int i=0;i<p_table;i++){
     printf("|addr: %x |len: %u |if_index: %u |nexthop: %x | metric: %u \n", table[i].addr, table[i].len, table[i].if_index, table[i].nexthop, table[i].metric);
