@@ -84,7 +84,7 @@ void vertical(uint32_t reidx, RipPacket *resp){
   }
 }
 
-void vertical_d(uint32_t reidx, RipPacket *resp, uint32_t *len){
+void vertical_d(uint32_t reidx, RipPacket *resp, int *len){
   int cnt=0;
   *len=0;
   for(int i=next[0];next[i]!=0;i=next[i]){
@@ -123,7 +123,7 @@ void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
   }
 }
 
-void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, uint32_t *len){
+void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, int *len){
   int cnt=0;
   *len=0;
   for(int i=next[0];next[i]!=0;i=next[i]){
@@ -172,7 +172,7 @@ void update(bool insert, RoutingTableEntry entry) {
     front[p_table+1]=p_table;
     next[p_table+1]=0;
     p_table++;
-    printf("inserted num %d\n",  p_table);
+    // printf("inserted num %d\n",  p_table);
     // fin=p_table;
     // table[p_table++]=entry;
     //next
