@@ -85,7 +85,6 @@ void vertical(uint32_t reidx, RipPacket *resp){
 }
 
 void vertical_d(uint32_t reidx, RipPacket *resp, int *len){
-  int cnt=0;
   *len=0;
   for(int i=next[0];next[i]!=0;i=next[i]){
     if(table[i].if_index!=reidx){
@@ -96,12 +95,10 @@ void vertical_d(uint32_t reidx, RipPacket *resp, int *len){
         .metric=table[i].metric
       };
       resp[*len].numEntries++;
-    }
-    cnt++;
-    if(cnt>20){
-      *len=*len+1;
-      resp[*len].numEntries=0;
-      cnt=0;
+      if(resp[*len].numEntries>24){
+        *len=*len+1;
+        resp[*len].numEntries=0;
+      }
     }
   }
 }
@@ -124,7 +121,6 @@ void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
 }
 
 void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, int *len){
-  int cnt=0;
   *len=0;
   for(int i=next[0];next[i]!=0;i=next[i]){
     if(table[i].if_index!=reidx){
@@ -135,11 +131,10 @@ void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, int *len){
         .metric=table[i].metric
       };
       resp[*len].numEntries++;
-    }
-    cnt++;
-    if(cnt>20){
-      *len=*len+1;
-      cnt=0;
+      if(resp[*len].numEntries>24){
+        *len=*len+1;
+        resp[*len].numEntries=0;
+      }
     }
   }
 }
@@ -172,6 +167,7 @@ void update(bool insert, RoutingTableEntry entry) {
     front[p_table+1]=p_table;
     next[p_table+1]=0;
     p_table++;
+    if(p_table>10000) printf(" @@@  ALERT  @@@\n");
     // printf("inserted num %d\n",  p_table);
     // fin=p_table;
     // table[p_table++]=entry;

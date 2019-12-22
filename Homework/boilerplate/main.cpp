@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
   }
 
   uint64_t last_time = 0;
+  int cnt0=0;
 
   while (1) {
     uint64_t time = HAL_GetTicks();
@@ -78,11 +79,12 @@ int main(int argc, char *argv[]) {
         ad0[5]=0x09;
 
         int len0=0;
-        vertical_2d(uint32_t(i), resp, addrs[i], len0);
+        vertical_2d(uint32_t(i), resp, addrs[i], &len0);
+        printf("printing  %d\n", len0);
         for(int j=0;j<=len0;j++){
           resp[j].command=2;
           // vertical(uint32_t(i), &resp);
-          //printf("vertical result: %d\n", resp.numEntries);
+          printf("vertical result: %d\n", resp[j].numEntries);
           output[0] = 0x45;
           output[1] = 0x00;
           output[4] = 0x00;
@@ -133,8 +135,9 @@ int main(int argc, char *argv[]) {
           HAL_SendIPPacket(i, output, rip_len + 20 + 8, ad0);
         }
       }
-      //printf("5s Timer\n");
       printAll();
+      printf("5s Timer %d\n", cnt0);
+      cnt0++;
       last_time = time;
     }
 
@@ -193,6 +196,7 @@ int main(int argc, char *argv[]) {
           // 3a.3 request, ref. RFC2453 3.9.1
           // only need to respond to whole table requests in the lab
           // RipPacket resp;
+          
           RipPacket resp[500];
           int len0=0;
           // TODO: fill resp
@@ -200,12 +204,12 @@ int main(int argc, char *argv[]) {
           // resp.command=2;
           // vertical(if_index, &resp);
 
-          vertical_d(if_index, resp, len0);
+          vertical_d(if_index, resp, &len0);
           for(int j=0;j<=len0;j++){
             resp[j].command=2;
 
             // vertical_2(uint32_t(i), &resp, addrs[i]);
-            //printf("vertical 2 result: %u \n", resp.numEntries);
+            printf("vertical result: %u \n", resp[j].numEntries);
             // assemble
             // IP
             output[0] = 0x45;
@@ -274,9 +278,10 @@ int main(int argc, char *argv[]) {
               // printf("invalidate entry "+rip.entries[i].addr);
               //tbd:send inval resp
             }else{
-              printf("updating %x %d\n", rip.entries[i].addr, rip.entries[i].metric);
+              //printf("updating %x %d\n", rip.entries[i].addr, rip.entries[i].metric);
               entry.metric+=1;
               update(true, entry);
+              //printf("updated %x %d\n", rip.entries[i].addr, rip.entries[i].metric);              
             }
           }
           // what is missing from RoutingTableEntry?
