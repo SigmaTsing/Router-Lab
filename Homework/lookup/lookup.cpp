@@ -22,9 +22,9 @@
   你可以在全局变量中把路由表以一定的数据结构格式保存下来。
 */
 
-RoutingTableEntry table[10100];
-int next[10100];
-int front[10100];
+RoutingTableEntry table[101000];
+int next[101000];
+int front[101000];
 int p_table=1;
 // int fin=0;
 
@@ -63,8 +63,9 @@ void init(){
 
 uint32_t clo(uint32_t mask){
   uint32_t cnt=0;
+  uint32_t mask0=ntohl(mask);
   for(int i=0;i<=31;i++){
-    if(((mask>>i)&0x1)==1){
+    if(((mask0>>(31-i))&0x1)==1){
       cnt++;
     }else{
       return cnt;
@@ -184,7 +185,7 @@ void update(bool insert, RoutingTableEntry entry) {
     front[p_table+1]=p_table;
     next[p_table+1]=0;
     p_table=p_table+1;
-    if(p_table>10000) printf(" @@@  ALERT  @@@\n");
+    //if(p_table>10000) printf(" @@@  ALERT  @@@\n");
     // printf("inserted num %d\n",  p_table);
     // fin=p_table;
     // table[p_table++]=entry;

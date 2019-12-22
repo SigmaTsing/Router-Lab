@@ -1,6 +1,7 @@
 #include "rip.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 #include<stdio.h>
 
 /*
@@ -65,25 +66,36 @@ bool disassemble(const uint8_t *packet, uint32_t len, RipPacket *output) {
     if(output->entries[i].metric>16) return false;
     else if(output->entries[i].metric==0) return false;
     int j;
-    uint32_t mask0=output->entries[i].mask;
-    // printf("%x \n", mask0);
-    if(mask0&0x1 == 0){
+    //uint32_t mask0=output->entries[i].mask;
+    //uint32_t mask1=0;
+    //for(int k=0;k<32;k++){
+    //  mask1=(mask1|(((mask0>>(31-k))&0x1)<<k));
+    //}
+    //mask0=ntohl(output->entries[i].mask);
+    //printf("mask: %x  %x  \n", mask0, output->entries[i].mask);
+    uint32_t mask0 = packet[iphlen+11]|(packet[iphlen+10]<<8)|(packet[iphlen+9]<<16)|(packet[iphlen+8]<<24);
+    if((mask0|mask0-1)!=0xFFFFFFFF){
+      return false;
+    }
+    //mask0=mask1;
+    //mask0=((((mask0>>0)&0xff)<<24)|(((mask0>>8)&0xff)<<16)|(((mask0>>16)&0xff)<<8)|(((mask0>>24)&0xff)<<0));
+    /*if((mask0&0x1) == 0){
       for(j=0;j<32;j++){
         if(((mask0>>j)&0x1 )== 1) break;
       }
-      // printf("break at %d\n", j);
+      //printf("break at %d\n", j);
       for(j=j+1;j<32;j++){
-        if(((mask0>>j)&0x1) == 0) return false;
+        if(((mask0>>j)&0x1) == 0) { printf(" bad\n"); return false; }
       }
     }else{
       for(j=0;j<32;j++){
         if(((mask0>>j)&0x1) == 0) break;
       }
-      // printf("break at %d\n", j);
+      //printf("break at %d\n", j);
       for(j=j+1;j<32;j++){
-        if(((mask0>>j)&0x1) == 1) return false;
-      }
-    }
+        if(((mask0>>j)&0x1) == 1) { printf(" bad\n"); return false; }
+      }*/
+    
   }
   return true;
 }
