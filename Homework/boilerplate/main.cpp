@@ -18,8 +18,8 @@ extern void vertical(uint32_t reidx, RipPacket *resp);
 extern void printAll();
 extern uint16_t IPChecksum(uint8_t *packet, size_t len);
 extern void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip);
-extern void vertical_d(uint32_t reidx, RipPacket *resp, uint32_t *len);
-extern void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, uint32_t *len);
+extern void vertical_d(uint32_t reidx, RipPacket *resp, int *len);
+extern void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, int *len);
 
 uint8_t packet[2048];
 uint8_t output[2048];
