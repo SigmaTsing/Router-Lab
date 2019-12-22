@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
 
       for(uint i=0;i<N_IFACE_ON_BOARD;i++){
         RipPacket resp[500];
+        resp[0].numEntries=0;
         // TODO: fill resp
         macaddr_t ad0;
         ad0[0]=0x01;
@@ -81,7 +82,6 @@ int main(int argc, char *argv[]) {
 
         int len0=0;
         vertical_2d(uint32_t(i), resp, addrs[i], &len0);
-        printf("printing  %d\n", len0);
           output[0] = 0x45;
           output[1] = 0x00;
           output[4] = 0x00;
@@ -200,6 +200,7 @@ int main(int argc, char *argv[]) {
           // RipPacket resp;
           
           RipPacket resp[500];
+          resp[0].numEntries=0;
           int len0=0;
           // TODO: fill resp
 

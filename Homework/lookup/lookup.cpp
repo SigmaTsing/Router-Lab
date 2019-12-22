@@ -149,7 +149,7 @@ void printAll(){
 
 void update(bool insert, RoutingTableEntry entry) {
   // TODO:
-  // printf("inserting addr %x\n", entry.addr);
+  printf("inserting addr %x\n", entry.addr);
   if(insert){
     for(int i=next[0];next[i]!=0;i=next[i]){
       if(table[i].addr==entry.addr && table[i].len==entry.len){
