@@ -84,6 +84,27 @@ void vertical(uint32_t reidx, RipPacket *resp){
   }
 }
 
+void vertical_d(uint32_t reidx, RipPacket *resp, uint32_t *len){
+  int cnt=0;
+  *len=0;
+  for(int i=next[0];next[i]!=0;i=next[i]){
+    if(table[i].if_index!=reidx){
+      resp[*len].entries[resp[*len].numEntries]={
+        .addr=table[i].addr,
+        .mask=genMask(table[i].len),
+        .nexthop=table[i].nexthop,
+        .metric=table[i].metric
+      };
+      resp[*len].numEntries++;
+    }
+    cnt++;
+    if(cnt>24){
+      *len=*len+1;
+      cnt=0;
+    }
+  }
+}
+
 void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
   resp->numEntries=0;
   // for(int i=0;i<p_table;i++){
@@ -97,6 +118,27 @@ void vertical_2(uint32_t reidx, RipPacket *resp, uint32_t ip){
         .metric=table[i].metric
       };
       resp->numEntries++;
+    }
+  }
+}
+
+void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, uint32_t *len){
+  int cnt=0;
+  *len=0;
+  for(int i=next[0];next[i]!=0;i=next[i]){
+    if(table[i].if_index!=reidx){
+      resp[*len].entries[resp[*len].numEntries]={
+        .addr=table[i].addr,
+        .mask=genMask(table[i].len),
+        .nexthop=ip,
+        .metric=table[i].metric
+      };
+      resp[*len].numEntries++;
+    }
+    cnt++;
+    if(cnt>24){
+      *len=*len+1;
+      cnt=0;
     }
   }
 }
