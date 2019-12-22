@@ -100,6 +100,7 @@ void vertical_d(uint32_t reidx, RipPacket *resp, uint32_t *len){
     cnt++;
     if(cnt>20){
       *len=*len+1;
+      resp[*len].numEntries=0;
       cnt=0;
     }
   }
@@ -153,16 +154,16 @@ void printAll(){
 
 void update(bool insert, RoutingTableEntry entry) {
   // TODO:
-  printf("inserting addr %x\n", entry.addr);
+  // printf("inserting addr %x\n", entry.addr);
   if(insert){
     for(int i=next[0];next[i]!=0;i=next[i]){
       if(table[i].addr==entry.addr && table[i].len==entry.len){
         if(entry.metric<=table[i].metric){
           table[i]=entry;
-          printf("inserted %u %u\n", table[i].metric, entry.metric);
+          // printf("inserted %u %u\n", table[i].metric, entry.metric);
           return;
         }else
-          printf("metric biger, ignore\n");
+          // printf("metric biger, ignore\n");
         return;
       }
     }
