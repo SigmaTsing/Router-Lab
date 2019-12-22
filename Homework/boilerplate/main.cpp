@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
           // resp.command=2;
           // vertical(if_index, &resp);
 
-          vertical_d(if_index, resp, &len0);
+          vertical_2d(if_index, resp, src_addr, &len0);
             // assemble
             // IP
             output[0] = 0x45;
