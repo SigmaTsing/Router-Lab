@@ -98,7 +98,7 @@ void vertical_d(uint32_t reidx, RipPacket *resp, uint32_t *len){
       resp[*len].numEntries++;
     }
     cnt++;
-    if(cnt>24){
+    if(cnt>20){
       *len=*len+1;
       cnt=0;
     }
@@ -136,7 +136,7 @@ void vertical_2d(uint32_t reidx, RipPacket *resp, uint32_t ip, uint32_t *len){
       resp[*len].numEntries++;
     }
     cnt++;
-    if(cnt>24){
+    if(cnt>20){
       *len=*len+1;
       cnt=0;
     }
