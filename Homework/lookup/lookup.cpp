@@ -25,7 +25,7 @@
 RoutingTableEntry table[10100];
 int next[10100];
 int front[10100];
-int p_table=0;
+int p_table=1;
 // int fin=0;
 
 /**
@@ -43,6 +43,16 @@ bool check(uint32_t a, uint32_t b){
         (((b>>16)&0xff)==0 || ((b>>16)&0xff)== ((a>>16)&0xff))&&
         (((b>>24)&0xff)==0 || ((b>>24)&0xff)== ((a>>24)&0xff))&&
         ((b&0xff)==0 || (b&0xff)== (a&0xff));
+}
+
+int check2(uint32_t a, uint32_t b){
+  // printf("%x %x %x %x\n", (b>>8)&0xff, (b>>16)&0xff, (b>>24)&0xff, b&0xff);
+  // printf("%x %x %x %x\n", (a>>8)&0xff, (a>>16)&0xff, (a>>24)&0xff, a&0xff);
+  if (((((b>>8)&0xff)==0 || ((b>>8)&0xff)== ((a>>8)&0xff))&&
+        (((b>>16)&0xff)==0 || ((b>>16)&0xff)== ((a>>16)&0xff))&&
+        (((b>>24)&0xff)==0 || ((b>>24)&0xff)== ((a>>24)&0xff))&&
+        ((b&0xff)==0 || (b&0xff)== (a&0xff)))==false) return -1;
+  return (((b>>8)&0xff)!=0)+(((b>>16)&0xff)!=0)+(((b>>24)&0xff)!=0)+(((b>>0)&0xff)!=0);
 }
 
 void init(){
@@ -143,30 +153,37 @@ void printAll(){
   // for(int i=0;i<p_table;i++){
   //printf("printing %d", next[0]);
   for(int i=next[0];next[i]!=0;i=next[i]){
-    printf("|addr: %x |len: %u |if_index: %u |nexthop: %x | metric: %u \n", table[i].addr, table[i].len, table[i].if_index, table[i].nexthop, table[i].metric);
+    printf("|addr: %d.%d.%d.%d |len: %u |if_index: %u |nexthop: %d.%d.%d.%d | metric: %u \n", ((table[i].addr>>0)&0xff),((table[i].addr>>8)&0xff),((table[i].addr>>16)&0xff),((table[i].addr>>24)&0xff), 
+    table[i].len, table[i].if_index, 
+    ((table[i].nexthop>>0)&0xff), ((table[i].nexthop>>8)&0xff),((table[i].nexthop>>16)&0xff),((table[i].nexthop>>24)&0xff),table[i].metric);
   }
 }
 
 void update(bool insert, RoutingTableEntry entry) {
   // TODO:
-  printf("inserting addr %x\n", entry.addr);
+  if(next[0]==0){
+    next[0]=1;
+    front[1]=0;
+  }
+  //printf("inserting addr %x\n", entry.addr);
   if(insert){
     for(int i=next[0];next[i]!=0;i=next[i]){
       if(table[i].addr==entry.addr && table[i].len==entry.len){
         if(entry.metric<=table[i].metric){
           table[i]=entry;
-          // printf("inserted %u %u\n", table[i].metric, entry.metric);
+          //printf("inserted %u %u\n", table[i].metric, entry.metric);
           return;
         }else
-          // printf("metric biger, ignore\n");
+          //printf("metric biger, ignore\n");
         return;
       }
     }
     table[p_table]=entry;
+    //printf("inserted %u %u %d\n", table[p_table].metric, entry.metric, p_table);
     next[p_table]=p_table+1;    
     front[p_table+1]=p_table;
     next[p_table+1]=0;
-    p_table++;
+    p_table=p_table+1;
     if(p_table>10000) printf(" @@@  ALERT  @@@\n");
     // printf("inserted num %d\n",  p_table);
     // fin=p_table;
@@ -184,7 +201,7 @@ void update(bool insert, RoutingTableEntry entry) {
       }
     }
   }
-}
+} 
 
 /**
  * @brief 进行一次路由表的查询，按照最长前缀匹配原则
@@ -198,17 +215,24 @@ bool query(uint32_t addr, uint32_t *nexthop, uint32_t *if_index) {
   *nexthop = 0;
   *if_index = 0;
   bool cz=false;
+  uint32_t mask;
+  int slen=-1;
+  int t0;
   // for(int i=0;i<p_table;i++){
   for(int i=next[0];next[i]!=0;i=next[i]){
-    if(check(addr,table[i].addr)){
+    //printf("in %d, next %d\n",i, next[i]); 
+    mask=table[i].len>=32?0xffffffff:(0x1<<(table[i].len))-1;
+    //if((addr&mask) == (table[i].addr&mask)){
+    t0=check2((addr&mask),(table[i].addr&mask));
+    //printf("masking %x  %x  %x  %d\n", (table[i].addr&mask),(addr&mask), mask, t0);
+    if(t0>=0){
+      if(slen>t0) continue;
       *nexthop=table[i].nexthop;
       *if_index=table[i].if_index;
-      cz=true;
-      if(addr==table[i].addr)
-        return true;
+      slen=t0;
     }
   }
-  return cz;
+  return (slen>=0);
 }
   void RipFill(RipPacket *resp, int *size, uint32_t src_addr){
     resp->numEntries=0;

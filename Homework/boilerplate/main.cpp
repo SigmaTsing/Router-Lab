@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cassert>
 
 extern bool validateIPChecksum(uint8_t *packet, size_t len);
 extern void update(bool insert, RoutingTableEntry entry);
@@ -313,16 +314,19 @@ int main(int argc, char *argv[]) {
           // update ttl and checksum
           forward(output, res);
           // TODO: you might want to check ttl=0 case
-          HAL_SendIPPacket(dest_if, output, res, dest_mac);
+          res = HAL_SendIPPacket(dest_if, output, res, dest_mac);
+          assert(res == 0);
+          printf("\033[32mforwarded %d.%d.%d.%d  %d.%d.%d.%d %d\n\033[0m", ((src_addr>>0)&0xff), ((src_addr>>8)&0xff), ((src_addr>>16)&0xff), ((src_addr>>24)&0xff, dest_if)
+          , ((dst_addr>>0)&0xff), ((dst_addr>>8)&0xff), ((dst_addr>>16)&0xff), ((dst_addr>>24)&0xff));
         } else {
           // not found
           // you can drop it
-          printf("ARP not found for %x\n", nexthop);
+          printf("\033[34mARP not found for %x\n\033[0m", nexthop);
         }
       } else {
         // not found
         // optionally you can send ICMP Host Unreachable
-        printf("IP not found for %x\n", src_addr);
+        printf("\033[31mIP not found for %x\n\033[0m", src_addr);
       }
     }
   }
