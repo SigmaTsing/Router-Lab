@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
       // multicast MAC for 224.0.0.9 is 01:00:5e:00:00:09
 
       for(uint i=0;i<N_IFACE_ON_BOARD;i++){
-        RipPacket resp[50];
+        RipPacket resp[500];
         // TODO: fill resp
         macaddr_t ad0;
         ad0[0]=0x01;
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
           // 3a.3 request, ref. RFC2453 3.9.1
           // only need to respond to whole table requests in the lab
           // RipPacket resp;
-          RipPacket resp[50];
+          RipPacket resp[500];
           int len0=0;
           // TODO: fill resp
 

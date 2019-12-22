@@ -22,9 +22,9 @@
   你可以在全局变量中把路由表以一定的数据结构格式保存下来。
 */
 
-RoutingTableEntry table[2000];
-int next[2000];
-int front[2000];
+RoutingTableEntry table[10100];
+int next[10100];
+int front[10100];
 int p_table=0;
 // int fin=0;
 
