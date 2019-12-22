@@ -34,6 +34,8 @@ bool forward(uint8_t *packet, size_t len) {
   t1=IPChecksum(packet, len);
   if(t1!=t0) return false;
   packet[8]=packet[8]-0x1;
+  //if(packet[10]==0x0) packet[10]=0xff;
+  //else packet[10]=packet[10]-0x1;
   t1=IPChecksum(packet, len);
   packet[10]=t1>>8;
   packet[11]=t1&0xff;

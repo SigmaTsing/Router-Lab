@@ -81,10 +81,6 @@ int main(int argc, char *argv[]) {
         int len0=0;
         vertical_2d(uint32_t(i), resp, addrs[i], &len0);
         printf("printing  %d\n", len0);
-        for(int j=0;j<=len0;j++){
-          resp[j].command=2;
-          // vertical(uint32_t(i), &resp);
-          printf("vertical result: %d\n", resp[j].numEntries);
           output[0] = 0x45;
           output[1] = 0x00;
           output[4] = 0x00;
@@ -114,6 +110,11 @@ int main(int argc, char *argv[]) {
           output[21] = 0x08;
           output[22] = 0x02;
           output[23] = 0x08;
+          
+        for(int j=0;j<=len0;j++){
+          resp[j].command=2;
+          // vertical(uint32_t(i), &resp);
+          printf("vertical result: %d\n", resp[j].numEntries);
           // RIP
           uint32_t rip_len = assemble(&resp[j], &output[20 + 8]);
           uint32_t ip_len=20+8+rip_len;
@@ -205,11 +206,6 @@ int main(int argc, char *argv[]) {
           // vertical(if_index, &resp);
 
           vertical_d(if_index, resp, &len0);
-          for(int j=0;j<=len0;j++){
-            resp[j].command=2;
-
-            // vertical_2(uint32_t(i), &resp, addrs[i]);
-            printf("vertical result: %u \n", resp[j].numEntries);
             // assemble
             // IP
             output[0] = 0x45;
@@ -237,6 +233,12 @@ int main(int argc, char *argv[]) {
             output[21] = 0x08;
             output[22] = 0x02;
             output[23] = 0x08;
+            
+          for(int j=0;j<=len0;j++){
+            resp[j].command=2;
+
+            // vertical_2(uint32_t(i), &resp, addrs[i]);
+            printf("vertical result: %u \n", resp[j].numEntries);
             // RIP
             uint32_t rip_len = assemble(&resp[j], &output[20 + 8]);
             uint32_t ip_len=20+8+rip_len;
